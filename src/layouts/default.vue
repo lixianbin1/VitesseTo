@@ -1,9 +1,15 @@
 <template>
-  <main class="px-4 py-10 text-center text-gray-700 dark:text-gray-200">
-    <RouterView />
-    <TheFooter />
-    <div class="mt-5 mx-auto text-center opacity-75 dark:opacity-50 text-sm">
-      [Default Layout]
-    </div>
-  </main>
+  <div id="main">
+    <el-container style="height: 100vh; ">
+      <el-header style="display: flex;align-items: center;">
+        <Head />
+      </el-header>
+      <el-container>
+        <Menu />
+        <el-main>
+          <RouterView />
+        </el-main>
+      </el-container>
+    </el-container>
+  </div>
 </template>
