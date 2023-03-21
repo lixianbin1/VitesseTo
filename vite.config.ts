@@ -7,6 +7,7 @@ import generateSitemap from 'vite-ssg-sitemap'
 import Layouts from 'vite-plugin-vue-layouts'
 import Components from 'unplugin-vue-components/vite'
 import AutoImport from 'unplugin-auto-import/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import Markdown from 'vite-plugin-vue-markdown'
 import { VitePWA } from 'vite-plugin-pwa'
 import VueI18n from '@intlify/unplugin-vue-i18n/vite'
@@ -21,9 +22,24 @@ export default defineConfig({
   resolve: {
     alias: {
       '~/': `${path.resolve(__dirname, 'src')}/`,
+      '@': `${path.resolve(__dirname, 'src')}/`,
     },
   },
-
+  // base: '/day/',
+  server: {
+    host: '0.0.0.0',
+    // 设置代理，根据我们项目实际情况配置
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8087/', // 本地
+        // target: 'http://10.31.27.157:8088/', // 何海峰IP
+        // target: 'http://10.31.27.228:8087/', // 李贤斌IP
+        // target: 'http://10.31.27.199:8087/', // 刘哲IP
+        changeOrigin: true, // 是否跨域
+        rewrite: path => path.replace('/^\/api/', '/api'),
+      },
+    },
+  },
   plugins: [
     // Preview(),
 
@@ -39,6 +55,10 @@ export default defineConfig({
     // https://github.com/hannoeru/vite-plugin-pages
     Pages({
       extensions: ['vue', 'md'],
+      // 打包时看情况修改
+      // pagesDir: [
+      //   { dir: 'src/pages', baseRoute: '/day' },
+      // ],
     }),
 
     // https://github.com/JohnCampionJr/vite-plugin-vue-layouts
@@ -60,6 +80,7 @@ export default defineConfig({
         'src/stores',
       ],
       vueTemplate: true,
+      resolvers: [ElementPlusResolver()],
     }),
 
     // https://github.com/antfu/unplugin-vue-components
@@ -69,6 +90,7 @@ export default defineConfig({
       // allow auto import and register components used in markdown
       include: [/\.vue$/, /\.vue\?vue/, /\.md$/],
       dts: 'src/components.d.ts',
+      resolvers: [ElementPlusResolver()],
     }),
 
     // https://github.com/antfu/unocss
@@ -164,5 +186,13 @@ export default defineConfig({
   ssr: {
     // TODO: workaround until they support native ESM
     noExternal: ['workbox-window', /vue-i18n/],
+  },
+  // css预处理器
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: '@import "./src/styles/main.scss";',
+      },
+    },
   },
 })
